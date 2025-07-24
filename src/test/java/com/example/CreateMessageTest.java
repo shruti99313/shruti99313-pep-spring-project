@@ -43,7 +43,7 @@ public class CreateMessageTest {
     
 
     /**
-     * Sending an http request to POST localhost:8080/messages with valid message credentials
+     * Sending an http request to POST localhost:8081/messages with valid message credentials
      * 
      * Expected Response:
      *  Status Code: 200
@@ -53,7 +53,7 @@ public class CreateMessageTest {
     public void createMessageSuccessful() throws IOException, InterruptedException {
     	String json = "{\"postedBy\":9999,\"messageText\": \"hello message\",\"timePostedEpoch\": 1669947792}";
         HttpRequest postMessageRequest = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/messages"))
+                .uri(URI.create("http://localhost:8081/messages"))
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .header("Content-Type", "application/json")
                 .build();
@@ -67,7 +67,7 @@ public class CreateMessageTest {
     }
     
     /**
-     * Sending an http request to POST localhost:8080/messages with empty message
+     * Sending an http request to POST localhost:8081/messages with empty message
      * 
      * Expected Response:
      *  Status Code: 400
@@ -76,7 +76,7 @@ public class CreateMessageTest {
     public void createMessageMessageTextBlank() throws IOException, InterruptedException {
     	String json = "{\"postedBy\":9999,\"messageText\": \"\",\"timePostedEpoch\": 1669947792}";
         HttpRequest postMessageRequest = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/messages"))
+                .uri(URI.create("http://localhost:8081/messages"))
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .header("Content-Type", "application/json")
                 .build();
@@ -87,7 +87,7 @@ public class CreateMessageTest {
 
 
     /**
-     * Sending an http request to POST localhost:8080/messages with message length greater than 254
+     * Sending an http request to POST localhost:8081/messages with message length greater than 254
      * 
      * Expected Response:
      *  Status Code: 400
@@ -99,7 +99,7 @@ public class CreateMessageTest {
     			+ "\"messageText\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\","
     			+ "\"timePostedEpoch\": 1669947792}";
         HttpRequest postMessageRequest = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/messages"))
+                .uri(URI.create("http://localhost:8081/messages"))
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .header("Content-Type", "application/json")
                 .build();
@@ -109,7 +109,7 @@ public class CreateMessageTest {
     }
 
     /**
-     * Sending an http request to POST localhost:8080/messages with a user id that doesnt exist in db
+     * Sending an http request to POST localhost:8081/messages with a user id that doesnt exist in db
      * 
      * Expected Response:
      *  Status Code: 400
@@ -118,7 +118,7 @@ public class CreateMessageTest {
     public void createMessageUserNotInDb() throws IOException, InterruptedException {
     	String json = "{\"postedBy\":5050,\"messageText\": \"hello message\",\"timePostedEpoch\": 1669947792}";
         HttpRequest postMessageRequest = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/messages"))
+                .uri(URI.create("http://localhost:8081/messages"))
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .header("Content-Type", "application/json")
                 .build();

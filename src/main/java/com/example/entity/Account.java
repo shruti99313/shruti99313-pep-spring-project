@@ -1,5 +1,7 @@
 package com.example.entity;
 
+import java.util.Objects;
+
 import javax.persistence.*;
 
 /**
@@ -96,6 +98,13 @@ public class Account {
     public void setPassword(String password) {
         this.password = password;
     }
+   
+
+@Override
+public int hashCode() {
+    return Objects.hash(accountId, username, password);
+}
+
     /**
      * Overriding the default equals() method adds functionality to tell when two objects are identical, allowing
      * Assert.assertEquals and List.contains to function.

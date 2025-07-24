@@ -24,11 +24,6 @@ public class RetrieveAllMessagesForUserTest {
     HttpClient webClient;
     ObjectMapper objectMapper;
 
-    /**
-     * Before every test, reset the database, restart the Javalin app, and create a new webClient and ObjectMapper
-     * for interacting locally on the web.
-     * @throws InterruptedException
-     */
     @BeforeEach
     public void setUp() throws InterruptedException {
         webClient = HttpClient.newHttpClient();
@@ -45,42 +40,37 @@ public class RetrieveAllMessagesForUserTest {
     }
     
     /**
-     * Sending an http request to GET localhost:8080/accounts/9999/messages (messages exist for user) 
-     * 
-     * Expected Response:
-     *  Status Code: 200
-     *  Response Body: JSON representation of a list of messages
+     * Sending an http request to GET localhost:8081/accounts/9999/messages (messages exist for user) 
      */
     @Test
     public void getAllMessagesFromUserMessageExists() throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/accounts/9999/messages"))
+                .uri(URI.create("http://localhost:8081/accounts/9999/messages"))
                 .build();
         HttpResponse<String> response = webClient.send(request, HttpResponse.BodyHandlers.ofString());
         int status = response.statusCode();
         Assertions.assertEquals(200, status, "Expected Status Code 200 - Actual Code was: " + status);
-        List<Message> expectedResult = new ArrayList<Message>();
+
+        List<Message> expectedResult = new ArrayList<>();
         expectedResult.add(new Message(9999, 9999, "test message 1", 1669947792L));
-        List<Message> actualResult = objectMapper.readValue(response.body().toString(), new TypeReference<List<Message>>(){});
-        Assertions.assertEquals(expectedResult, actualResult, "Expected="+expectedResult + ", Actual="+actualResult);
+
+        List<Message> actualResult = objectMapper.readValue(response.body(), new TypeReference<List<Message>>() {});
+        Assertions.assertEquals(expectedResult, actualResult, "Expected=" + expectedResult + ", Actual=" + actualResult);
     }
-    
+
     /**
-     * Sending an http request to GET localhost:8080/accounts/9998/messages (messages does NOT exist for user) 
-     * 
-     * Expected Response:
-     *  Status Code: 200
-     *  Response Body: 
+     * Sending an http request to GET localhost:8081/accounts/9998/messages (no messages exist for user) 
      */
     @Test
     public void getAllMessagesFromUserNoMessagesFound() throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/accounts/9998/messages"))
+                .uri(URI.create("http://localhost:8081/accounts/9998/messages"))
                 .build();
         HttpResponse<String> response = webClient.send(request, HttpResponse.BodyHandlers.ofString());
         int status = response.statusCode();
         Assertions.assertEquals(200, status, "Expected Status Code 200 - Actual Code was: " + status);
-        List<Message> actualResult = objectMapper.readValue(response.body().toString(), new TypeReference<List<Message>>(){});
+
+        List<Message> actualResult = objectMapper.readValue(response.body(), new TypeReference<List<Message>>() {});
         Assertions.assertTrue(actualResult.isEmpty(), "Expected Empty Result, but Result was not Empty");
     }
 }

@@ -1,7 +1,6 @@
 package com.example;
 
 import java.io.IOException;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -18,15 +17,12 @@ import com.example.entity.Account;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class UserLoginTest {
-	ApplicationContext app;
+    ApplicationContext app;
     HttpClient webClient;
     ObjectMapper objectMapper;
 
-    /**
-     * Before every test, reset the database, restart the Javalin app, and create a new webClient and ObjectMapper
-     * for interacting locally on the web.
-     * @throws InterruptedException
-     */
+    private static final String BASE_URL = "http://localhost:8081"; // <-- Changed port
+
     @BeforeEach
     public void setUp() throws InterruptedException {
         webClient = HttpClient.newHttpClient();
@@ -38,68 +34,52 @@ public class UserLoginTest {
 
     @AfterEach
     public void tearDown() throws InterruptedException {
-    	Thread.sleep(500);
-    	SpringApplication.exit(app);
+        Thread.sleep(500);
+        SpringApplication.exit(app);
     }
-    
-    /**
-     * Sending an http request to POST localhost:8080/login with valid username and password
-     * 
-     * Expected Response:
-     *  Status Code: 200
-     *  Response Body: JSON representation of user object
-     */
+
     @Test
     public void loginSuccessful() throws IOException, InterruptedException {
-    	String json = "{\"accountId\":0,\"username\":\"testuser1\",\"password\":\"password\"}";
+        String json = "{\"accountId\":0,\"username\":\"testuser1\",\"password\":\"password\"}";
         HttpRequest postRequest = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/login"))
+                .uri(URI.create(BASE_URL + "/login")) // updated port
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .header("Content-Type", "application/json")
                 .build();
+
         HttpResponse<String> response = webClient.send(postRequest, HttpResponse.BodyHandlers.ofString());
         int status = response.statusCode();
         Assertions.assertEquals(200, status);
+
         ObjectMapper om = new ObjectMapper();
         Account expectedResult = new Account(9999, "testuser1", "password");
-        Account actualResult = om.readValue(response.body().toString(), Account.class);
-        Assertions.assertEquals(expectedResult, actualResult);        
+        Account actualResult = om.readValue(response.body(), Account.class);
+        Assertions.assertEquals(expectedResult, actualResult);
     }
 
-    /**
-     * Sending an http request to POST localhost:8080/login with invalid username
-     * 
-     * Expected Response:
-     * 	Status Code: 401 
-     */
     @Test
     public void loginInvalidUsername() throws IOException, InterruptedException {
-    	String json = "{\"accountId\":9999,\"username\":\"testuser404\",\"password\":\"password\"}";
+        String json = "{\"accountId\":9999,\"username\":\"testuser404\",\"password\":\"password\"}";
         HttpRequest postRequest = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/login"))
+                .uri(URI.create(BASE_URL + "/login")) // updated port
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .header("Content-Type", "application/json")
                 .build();
+
         HttpResponse<String> response = webClient.send(postRequest, HttpResponse.BodyHandlers.ofString());
         int status = response.statusCode();
         Assertions.assertEquals(401, status, "Expected Status Code 401 - Actual Code was: " + status);
     }
-    
 
-    /**
-     * Sending an http request to POST localhost:8080/login with invalid password
-     * 
-     * Expected Response:
-     * 	Status Code: 401
-     */
     @Test
     public void loginInvalidPassword() throws IOException, InterruptedException {
-    	String json = "{\"accountId\":9999,\"username\":\"testuser1\",\"password\":\"pass404\"}";
+        String json = "{\"accountId\":9999,\"username\":\"testuser1\",\"password\":\"pass404\"}";
         HttpRequest postRequest = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/login"))
+                .uri(URI.create(BASE_URL + "/login")) // updated port
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .header("Content-Type", "application/json")
                 .build();
+
         HttpResponse<String> response = webClient.send(postRequest, HttpResponse.BodyHandlers.ofString());
         int status = response.statusCode();
         Assertions.assertEquals(401, status, "Expected Status Code 401 - Actual Code was: " + status);

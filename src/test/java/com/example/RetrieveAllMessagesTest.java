@@ -24,11 +24,6 @@ public class RetrieveAllMessagesTest {
     HttpClient webClient;
     ObjectMapper objectMapper;
 
-    /**
-     * Before every test, reset the database, restart the Javalin app, and create a new webClient and ObjectMapper
-     * for interacting locally on the web.
-     * @throws InterruptedException
-     */
     @BeforeEach
     public void setUp() throws InterruptedException {
         webClient = HttpClient.newHttpClient();
@@ -43,20 +38,23 @@ public class RetrieveAllMessagesTest {
     	Thread.sleep(500);
     	SpringApplication.exit(app);
     }
-    
+
     @Test
     public void getAllMessagesMessagesAvailable() throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/messages"))
+                .uri(URI.create("http://localhost:8081/messages")) // <-- updated port to 8081
                 .build();
+
         HttpResponse<String> response = webClient.send(request, HttpResponse.BodyHandlers.ofString());
         int status = response.statusCode();
         Assertions.assertEquals(200, status, "Expected Status Code 200 - Actual Code was: " + status);
-        List<Message> expectedResult = new ArrayList<Message>();
+
+        List<Message> expectedResult = new ArrayList<>();
         expectedResult.add(new Message(9996, 9996, "test message 3", 1669947792L));
         expectedResult.add(new Message(9997, 9997, "test message 2", 1669947792L));
         expectedResult.add(new Message(9999, 9999, "test message 1", 1669947792L));
-        List<Message> actualResult = objectMapper.readValue(response.body().toString(), new TypeReference<List<Message>>(){});
-        Assertions.assertEquals(expectedResult, actualResult, "Expected="+expectedResult + ", Actual="+actualResult);
+
+        List<Message> actualResult = objectMapper.readValue(response.body(), new TypeReference<List<Message>>() {});
+        Assertions.assertEquals(expectedResult, actualResult, "Expected=" + expectedResult + ", Actual=" + actualResult);
     }
 }
